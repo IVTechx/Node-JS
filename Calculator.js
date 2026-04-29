@@ -14,6 +14,7 @@ process.stdin.on("data", (input) => {
 
   if (values.length !== 3) {
     console.log("Invalid number of arguments");
+    return;
   }
 
   const num1 = Number(values[0]);
@@ -22,6 +23,7 @@ process.stdin.on("data", (input) => {
 
   if (isNaN(num1) || isNaN(num2)) {
     console.log("Please enter valid numbers");
+    return;
   }
 
   let result;
@@ -36,14 +38,17 @@ process.stdin.on("data", (input) => {
     case "/":
       if (num2 === 0) {
         console.log("Can't divide by 0");
+        return;
       }
       result = num1 / num2;
       break;
     case "-":
       result = num1 - num2;
       break;
-    default:
+    default: {
       console.log("Unknown operator. Please try +,-,/ or *");
+      return;
+    }
   }
   console.log(`Result: ${result}`);
 });
