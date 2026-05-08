@@ -29,4 +29,4 @@ async function organizeFiles(dir) {
   }
 }
 
-organizeFiles("./Files (copy)");
+organizeFiles("./Files");
