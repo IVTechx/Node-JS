@@ -1,25 +1,32 @@
-import { mkdir, readdir, rename} from 'fs/promises'; 
-import path from 'path'
+import { mkdir, readdir, rename, stat } from "fs/promises";
+import path from "path";
 
-async function moveFile(oldPath, newPath) {
-  try{
-    await rename(oldPath, newPath);
-    console.log(`Moved ${oldPath} to ${newPath} successfully. `);
+async function organizeFiles(dir) {
+  try {
+    const names = await readdir(dir);
+    console.log(names);
+
+    for (const name of names) {
+      const oldPath = path.join(dir, name);
+      const nameStat = await stat(oldPath);
+
+      if (!nameStat.isFile()) continue;
+
+      // const ext = path.extname(name).substring(1).toLowerCase();
+      const ext = path.extname(name).substring(1).toLowerCase() || "others";
+
+      const subFolder = path.join(dir, ext);
+      await mkdir(subFolder, { recursive: true });
+
+      const newPath = path.join(subFolder, name);
+      await rename(oldPath, newPath);
+
+      console.log(`Sorted ${name} -> ${ext}`);
+    }
+    console.log("!Succesfully organized!");
   } catch (err) {
-    console.error('Error moving file:', err);
+    console.error("Organizing failed: ", err);
   }
 }
 
-const allFiles = await readdir('./Files');
-const folders = new Set();
-for (const file of allFiles) {
-const ext = path.extname(file).substring(1);
-if(!ext)continue;
-
-if(!folders.has(ext)){
-  await mkdir(`./Files/${ext}`);
-  folders.add(ext);
-}
-await moveFile(`./Files/${file}`, `./Files/${ext}/${file}`);
-console.log(folders);
-}
+organizeFiles("./Files (copy)");
