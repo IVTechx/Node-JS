@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Todo</title>
+</head>
+
+<body>
+    <h1>Todo List</h1>
+    <input type="text" id="todoInput" placeholder="New task...">
+    <button onclick="addTodo()">Add</button>
+    <div id="error-message" style="color: red; font-size: 0.8rem; height: 1rem; margin-top: 5px;"></div>
+    <ol id="list"></ol>
+
+    <script>
+        async function fetchTodos() {
+            const res = await fetch('/api/todos');
+            const data = await res.json();
+            const list = document.getElementById('list')
+            list.innerHTML = data.map(t => `<li>${t.task}</li>`).join('');
+        }
+
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const errorDiv = document.getElementById('error-message');
+            const taskText = input.value.trim();
+
+            if (!taskText) {
+                errorDiv.innerText = "Task can't be empty!"
+                input.focus();
+                return;
+            }
+            
+            await fetch('/api/todos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task: taskText })
+            });
+            input.value = '';
+            fetchTodos();
+        }
+
+        document.getElementById('todoInput').addEventListener('input', () => {
+            document.getElementById('error-message').innerText = "";
+        });
+
+        fetchTodos();
+    </script>
+</body>
+
+</html>
